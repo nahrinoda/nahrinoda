@@ -8,4 +8,4 @@ Currently building AI products at [Navox Labs](https://github.com/navox-labs). A
 
 [![LinkedIn](https://img.shields.io/badge/LINKEDIN-nahrinoda-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/nahrinoda) [![Navox Network](https://img.shields.io/badge/NAVOX-NETWORK-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.navox.tech/network) [![Website](https://img.shields.io/badge/WEBSITE-navox.tech-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.navox.tech) [![Agents](https://img.shields.io/badge/NAVOX-AGENTS-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/navox-labs/agents) [![Medium](https://img.shields.io/badge/MEDIUM-@nahrin__40746-000000?style=for-the-badge&logo=medium&logoColor=white)](https://medium.com/@nahrin_40746)
 
-[![Nahrin's GitHub Stats](https://github-readme-stats.vercel.app/api?username=nahrinoda&show_icons=true&show=reviews&rank_icon=default&include_all_commits=true&count_private=true)](https://github.com/nahrinoda)
+[![Nahrin's GitHub Stats](./stats.svg)](https://github.com/nahrinoda)
