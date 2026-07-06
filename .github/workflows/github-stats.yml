@@ -28,38 +28,45 @@ jobs:
           REVIEWS=$(echo "$STATS" | jq '.data.user.contributionsCollection.totalPullRequestReviewContributions')
           STARS=$(echo "$STATS" | jq '[.data.user.repositories.nodes[].stargazerCount] | add // 0')
 
-          # Calculate rank using weighted score against median GitHub user stats
-          RANK=$(awk -v commits="$TOTAL_COMMITS" -v prs="$PRS" -v issues="$ISSUES" -v reviews="$REVIEWS" -v stars="$STARS" '
-          BEGIN {
-            # Exponential CDF: 1 - e^(-x/median)
-            # Medians based on github-readme-stats thresholds
-            s = 1 - exp(-commits / 250)
-            s += 1 - exp(-prs / 50)
-            s += 1 - exp(-issues / 25)
-            s += 1 - exp(-reviews / 2)
-            s += 1 - exp(-stars / 50)
-            score = s / 5
+          # Get followers count
+          FOLLOWERS=$(curl -s -H "Authorization: bearer $GH_TOKEN" https://api.github.com/users/nahrinoda | jq '.followers')
 
-            if (score >= 0.95) print "S+"
-            else if (score >= 0.85) print "S"
-            else if (score >= 0.75) print "A++"
-            else if (score >= 0.65) print "A+"
-            else if (score >= 0.55) print "A"
-            else if (score >= 0.45) print "A-"
-            else if (score >= 0.35) print "B+"
-            else if (score >= 0.25) print "B"
-            else print "B-"
+          # Calculate rank using exact github-readme-stats algorithm
+          # exponential_cdf(x) = 1 - 2^(-x), log_normal_cdf(x) = x/(1+x)
+          RANK=$(awk -v commits="$TOTAL_COMMITS" -v prs="$PRS" -v issues="$ISSUES" -v reviews="$REVIEWS" -v stars="$STARS" -v followers="$FOLLOWERS" '
+          BEGIN {
+            l2 = log(2)
+            c = 1 - exp(-(commits/1000) * l2)
+            p = 1 - exp(-(prs/50) * l2)
+            i = 1 - exp(-(issues/25) * l2)
+            r = 1 - exp(-(reviews/2) * l2)
+            s = (stars/50) / (1 + stars/50)
+            f = (followers/10) / (1 + followers/10)
+            rank = 1 - (2*c + 3*p + 1*i + 1*r + 4*s + 1*f) / 12
+            pct = rank * 100
+
+            if (pct <= 1) print "S"
+            else if (pct <= 12.5) print "A+"
+            else if (pct <= 25) print "A"
+            else if (pct <= 37.5) print "A-"
+            else if (pct <= 55) print "B+"
+            else if (pct <= 70) print "B"
+            else if (pct <= 82.5) print "B-"
+            else if (pct <= 92.5) print "C+"
+            else print "C"
           }')
 
-          # Calculate percentile for the ring (0-1 scale, higher is better)
-          PERCENTILE=$(awk -v commits="$TOTAL_COMMITS" -v prs="$PRS" -v issues="$ISSUES" -v reviews="$REVIEWS" -v stars="$STARS" '
+          PERCENTILE=$(awk -v commits="$TOTAL_COMMITS" -v prs="$PRS" -v issues="$ISSUES" -v reviews="$REVIEWS" -v stars="$STARS" -v followers="$FOLLOWERS" '
           BEGIN {
-            s = 1 - exp(-commits / 250)
-            s += 1 - exp(-prs / 50)
-            s += 1 - exp(-issues / 25)
-            s += 1 - exp(-reviews / 2)
-            s += 1 - exp(-stars / 50)
-            printf "%.2f", s / 5
+            l2 = log(2)
+            c = 1 - exp(-(commits/1000) * l2)
+            p = 1 - exp(-(prs/50) * l2)
+            i = 1 - exp(-(issues/25) * l2)
+            r = 1 - exp(-(reviews/2) * l2)
+            s = (stars/50) / (1 + stars/50)
+            f = (followers/10) / (1 + followers/10)
+            rank = 1 - (2*c + 3*p + 1*i + 1*r + 4*s + 1*f) / 12
+            printf "%.2f", 1 - rank
           }')
 
           # SVG ring: circumference = 2*pi*40 ≈ 251.3
