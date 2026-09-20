@@ -15,7 +15,7 @@
   <g transform="translate(410, 120)">
     <circle cx="0" cy="0" r="40" class="rank-circle-bg"/>
     <circle cx="0" cy="0" r="40" class="rank-circle"
-      stroke-dasharray="148.3 103.0"
+      stroke-dasharray="150.8 100.5"
       transform="rotate(-90)"/>
     <text x="0" y="8" text-anchor="middle" class="rank-text">A-</text>
   </g>
