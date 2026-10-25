@@ -31,7 +31,7 @@ jobs:
 
           STARS=$(curl -s -H "Authorization: bearer $GH_TOKEN" -X POST https://api.github.com/graphql -d '
           {
-            "query": "{ user(login: \"nahrinoda\") { repositories(ownerAffiliations: OWNER, first: 100) { nodes { stargazerCount } } } }"
+            "query": "{ user(login: \"nahrinoda\") { repositories(ownerAffiliations: OWNER, privacy: PUBLIC, first: 100, orderBy: {field: STARGAZERS, direction: DESC}) { nodes { stargazerCount } } } }"
           }' | jq '[.data.user.repositories.nodes[].stargazerCount] | add // 0')
 
           # Get followers count
@@ -125,7 +125,8 @@ jobs:
           </svg>
           SVGEOF
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # STATS_TOKEN: read-only fine-grained PAT so private repos count; falls back to public-only stats
+          GH_TOKEN: ${{ secrets.STATS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Commit and push
         run: |
